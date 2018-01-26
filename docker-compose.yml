@@ -1,0 +1,139 @@
+version: '2.0'
+services:
+    php-fpm:
+        # {{{
+        build: DockerFiles/php/7.1/fpm
+        image: php71-fpm
+        container_name: ${ENV_SERVICES_PREFIX}php71-fpm
+        networks:
+            - backend
+            - frontend
+        depends_on:
+            - "mysql"
+            - "memcached"
+            - "redis"
+        volumes:
+            - ${ENV_WEB_BASE_PATH}${ENV_WEB_ROOT_PATH}:/web/
+        extra_hosts:
+            - "websocket.local.com:${ENV_NGINX_IP}"
+        restart: always
+        # }}}
+    php-cli:
+        # {{{
+        build: DockerFiles/php/7.1/cli
+        image: php71-cli
+        container_name: ${ENV_SERVICES_PREFIX}php71-cli
+        networks:
+            - backend
+            - frontend
+        depends_on:
+            - "mysql"
+            - "memcached"
+            - "redis"
+        volumes:
+            - ${ENV_WEB_BASE_PATH}${ENV_WEB_ROOT_PATH}:/web/
+        extra_hosts:
+            - "websocket.local.com:${ENV_NGINX_IP}"
+        restart: always
+        command: ["/web/websocketServer.php"]
+        # }}}
+    nginx:
+    # {{{
+        build: DockerFiles/nginx
+        image: nginx
+        container_name: ${ENV_SERVICES_PREFIX}nginx
+        hostname: nginx 
+        depends_on:
+            - "php-fpm"
+            - "php-cli"
+        volumes_from:
+            - php-fpm
+        volumes:
+            # Nginx configurate.
+            #- "${ENV_WEB_BASE_PATH}${ENV_WEB_CONFIG_PATH}nginx/nginx.conf:/etc/nginx/nginx.conf"
+            #- "${ENV_WEB_BASE_PATH}${ENV_WEB_CONFIG_PATH}nginx/enable-phpfpm.conf:/etc/nginx/enable-phpfpm.conf"
+            - "${ENV_WEB_BASE_PATH}${ENV_WEB_CONFIG_PATH}nginx/conf.d/:/etc/nginx/conf.d/"
+            # Logs.
+            - "${ENV_WEB_BASE_PATH}${ENV_WEB_LOG_PATH}nginx/:/var/log/nginx/"
+        ports:
+            - "80:80"
+            #- "443:443"
+        restart: always
+        networks:
+            frontend:
+                ipv4_address: ${ENV_NGINX_IP}
+    # }}}
+    mysql:
+    # {{{
+        build: DockerFiles/mysql/debian/8.0
+        image: mysql:debian
+        container_name: ${ENV_SERVICES_PREFIX}mysql
+        hostname: mysql
+        depends_on:
+            #- alpine
+            - debian
+        volumes:
+            - "${ENV_WEB_BASE_PATH}${ENV_WEB_MYSQL_DATABASE_PATH}:/var/lib/mysql"
+            #- "${ENV_WEB_BASE_PATH}${ENV_WEB_CONFIG_PATH}mysql/alpine/my.cnf:/etc/mysql/my.cnf"
+            #- "${ENV_WEB_BASE_PATH}${ENV_WEB_CONFIG_PATH}mysql/debian/my.cnf:/etc/mysql/my.cnf"
+        environment:
+            - "MYSQL_ROOT_PASSWORD=1234"
+        ports:
+            - "3306:3306"
+        networks:
+            - backend
+        #command: ['--datadir=/mysql-data','--user=mysql']
+        restart: always
+    # }}}
+    memcached:
+    # {{{
+        build: DockerFiles/memcached
+        image: memcached
+        container_name: ${ENV_SERVICES_PREFIX}memcached
+        hostname: memcached
+        depends_on:
+             - alpine
+        ports:
+            - "11211:11211"
+        networks:
+            - backend
+        restart: always
+        #command: ["-m", "64", "-p", "11211"]
+    # }}}
+    redis:
+    # {{{
+        build: DockerFiles/redis
+        image: redis
+        container_name: ${ENV_SERVICES_PREFIX}redis
+        hostname: redis
+        depends_on:
+             - alpine
+        ports:
+            - "6379:6379"
+        networks:
+            - backend
+        restart: always
+    # }}}
+    alpine:
+        # {{{
+        build: DockerFiles/alpine
+        image: codezm/alpine:3.4
+        container_name: ${ENV_SERVICES_PREFIX}test
+        command: /bin/sh -c "while true; do echo 'hello codezm!'; sleep 1; done"
+        # }}}
+    debian:
+        # {{{
+        build: DockerFiles/debian
+        image: codezm/debian:jessie
+        container_name: ${ENV_SERVICES_PREFIX}debian
+        hostname: debian-codezm-hostname
+        domainname: debian-codezm-domainname
+        command: /bin/bash -c "while true; do echo 'hello codezm!'; sleep 1; done"
+        # }}}
+
+networks:
+    frontend:
+        ipam:
+            config:
+                - subnet: 172.0.0.0/16
+    backend:

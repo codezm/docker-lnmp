@@ -1,0 +1,55 @@
+FROM codezm/alpine:3.4
+
+# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
+RUN adduser -D memcache
+
+ENV MEMCACHED_VERSION 1.5.2
+ENV MEMCACHED_SHA1 5d6c85fe15b5e575a563ec1bbeb01020e0132958
+
+RUN set -x \
+	\
+	&& apk add --no-cache --virtual .build-deps \
+	    openssl \
+		ca-certificates \
+		coreutils \
+		cyrus-sasl-dev \
+		dpkg-dev dpkg \
+		gcc \
+		libc-dev \
+		libevent-dev \
+		linux-headers \
+		make \
+		tar \
+	\
+	&& wget -O memcached.tar.gz "https://memcached.org/files/memcached-$MEMCACHED_VERSION.tar.gz" \
+	&& echo "$MEMCACHED_SHA1  memcached.tar.gz" | sha1sum -c - \
+	&& mkdir -p /usr/src/memcached \
+	&& tar -xzf memcached.tar.gz -C /usr/src/memcached --strip-components=1 \
+	&& rm memcached.tar.gz \
+	\
+	&& cd /usr/src/memcached \
+	\
+	&& ./configure \
+		--build="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
+		--enable-sasl \
+	&& make -j "$(nproc)" \
+	\
+	&& make test \
+	&& make install \
+	\
+	&& cd / && rm -rf /usr/src/memcached \
+	\
+	&& runDeps="$( \
+		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+			| tr ',' '\n' \
+			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+	)" \
+	&& apk add --virtual .memcached-rundeps $runDeps \
+	&& apk del .build-deps
+
+USER memcache
+
+EXPOSE 11211
+
+ENTRYPOINT ["memcached"]
