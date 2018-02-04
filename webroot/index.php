@@ -8,3 +8,4 @@
  */
 
 echo 'LNMP Site is ok!';
+phpinfo();
