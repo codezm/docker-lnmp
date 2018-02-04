@@ -2,7 +2,7 @@ version: '2.0'
 services:
     php-fpm:
         # {{{
-        build: DockerFiles/php/7.1/fpm
+        build: dockerfiles/php/7.1/fpm
         image: php71-fpm
         container_name: ${ENV_SERVICES_PREFIX}php71-fpm
         networks:
@@ -20,7 +20,7 @@ services:
         # }}}
     php-cli:
         # {{{
-        build: DockerFiles/php/7.1/cli
+        build: dockerfiles/php/7.1/cli
         image: php71-cli
         container_name: ${ENV_SERVICES_PREFIX}php71-cli
         networks:
@@ -39,7 +39,7 @@ services:
         # }}}
     nginx:
     # {{{
-        build: DockerFiles/nginx
+        build: dockerfiles/nginx
         image: nginx
         container_name: ${ENV_SERVICES_PREFIX}nginx
         hostname: nginx 
@@ -65,7 +65,7 @@ services:
     # }}}
     mysql:
     # {{{
-        build: DockerFiles/mysql/debian/8.0
+        build: dockerfiles/mysql/debian/8.0
         image: mysql:debian
         container_name: ${ENV_SERVICES_PREFIX}mysql
         hostname: mysql
@@ -87,7 +87,7 @@ services:
     # }}}
     memcached:
     # {{{
-        build: DockerFiles/memcached
+        build: dockerfiles/memcached
         image: memcached
         container_name: ${ENV_SERVICES_PREFIX}memcached
         hostname: memcached
@@ -102,7 +102,7 @@ services:
     # }}}
     redis:
     # {{{
-        build: DockerFiles/redis
+        build: dockerfiles/redis
         image: redis
         container_name: ${ENV_SERVICES_PREFIX}redis
         hostname: redis
@@ -116,14 +116,14 @@ services:
     # }}}
     alpine:
         # {{{
-        build: DockerFiles/alpine
+        build: dockerfiles/alpine
         image: codezm/alpine:3.4
         container_name: ${ENV_SERVICES_PREFIX}test
         command: /bin/sh -c "while true; do echo 'hello codezm!'; sleep 1; done"
         # }}}
     debian:
         # {{{
-        build: DockerFiles/debian
+        build: dockerfiles/debian
         image: codezm/debian:jessie
         container_name: ${ENV_SERVICES_PREFIX}debian
         hostname: debian-codezm-hostname

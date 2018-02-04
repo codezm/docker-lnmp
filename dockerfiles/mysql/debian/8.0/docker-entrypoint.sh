@@ -87,7 +87,6 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
 
 		mkdir -p "$DATADIR"
 
-        ls -la $DATADIR
 		echo 'Initializing database'
 		"$@" --initialize-insecure
 		echo 'Database initialized'

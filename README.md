@@ -16,7 +16,7 @@ Docker-LNMP
     - memcached         -- Memcached Version: 1.5.2
 
 ## 目录结构
-    ▾ DockerFiles/        -- 包含所有服务的 Dockerfile
+    ▾ dockerfiles/        -- 包含所有服务的 Dockerfile
       ▸ alpine/            
       ▸ debian/            
       ▸ memcached/         
@@ -24,7 +24,7 @@ Docker-LNMP
       ▸ nginx/             
       ▸ php/               
       ▸ redis/             
-    ▸ MysqlDB/            -- Mysql数据库数据存储目录
+    ▸ mysqldb/            -- Mysql数据库数据存储目录, Tips: Build 时将清空此目录所有文件
     ▾ webconf/            -- 服务配置目录
       ▸ mysql/             
       ▸ nginx/             
