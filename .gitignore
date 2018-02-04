@@ -1,0 +1,2 @@
+mysqldb/*
+!mysqldb/.gitkeep
