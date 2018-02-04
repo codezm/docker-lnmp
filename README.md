@@ -24,7 +24,7 @@ Docker-LNMP
       ▸ nginx/             
       ▸ php/               
       ▸ redis/             
-    ▸ mysqldb/            -- Mysql数据库数据存储目录, Tips: Build 时将清空此目录所有文件
+    ▸ mysqldb/            -- Mysql数据库数据存储目录
     ▾ webconf/            -- 服务配置目录
       ▸ mysql/             
       ▸ nginx/             
