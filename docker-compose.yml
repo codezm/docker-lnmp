@@ -1,5 +1,24 @@
 version: '2.0'
 services:
+    php-base:
+        # {{{
+        build: dockerfiles/php/7.2/base
+        image: php72-base
+        container_name: ${ENV_SERVICES_PREFIX}php72-base
+        networks:
+            - backend
+            - frontend
+        depends_on:
+            - "mysql"
+            - "memcached"
+            - "redis"
+        volumes:
+            - ${ENV_WEB_BASE_PATH}${ENV_WEB_ROOT_PATH}:/web/
+        extra_hosts:
+            - "websocket.local.com:${ENV_NGINX_IP}"
+        entrypoint: /bin/sh -c "while true; do echo 'hello codezm!'; sleep 1; done"
+        restart: always
+        # }}}
     php-fpm:
         # {{{
         build: dockerfiles/php/7.1/fpm
