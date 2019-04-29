@@ -9,7 +9,7 @@ ENV MEMCACHED_SHA1 5d6c85fe15b5e575a563ec1bbeb01020e0132958
 RUN set -x \
 	\
 	&& apk add --no-cache --virtual .build-deps \
-	    openssl \
+        openssl \
 		ca-certificates \
 		coreutils \
 		cyrus-sasl-dev \
@@ -20,6 +20,7 @@ RUN set -x \
 		linux-headers \
 		make \
 		tar \
+		wget \
 	\
 	&& wget -O memcached.tar.gz "https://memcached.org/files/memcached-$MEMCACHED_VERSION.tar.gz" \
 	&& echo "$MEMCACHED_SHA1  memcached.tar.gz" | sha1sum -c - \
